@@ -1,0 +1,1835 @@
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/CustomFIeld/main/RayField.lua'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "SONIC.EXE TD GUI",
+   LoadingTitle = "runners interference",
+   LoadingSubtitle = "by Len",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "EXE Hub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "sirius", -- The Discord invite code, do not include discord.gg/
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "SONIC.EXE TD Hub",
+      Subtitle = "small exe",
+      Note = "cooldown is buggy",
+      FileName = "SonicKey",
+      SaveKey = true,
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = "Hello"
+   }
+})
+
+local EXETab = Window:CreateTab("EXE", nil) -- Title, Image
+
+local SurvivorTab = Window:CreateTab("Survivor", nil) -- Title, Image
+
+local CharacterTab = Window:CreateTab("Characters", nil) -- Title, Image
+local CharacterSection = CharacterTab:CreateSection("Character") 
+
+local TeleportsTab = Window:CreateTab("Teleports", nil) -- Title, Image
+
+local OPTab = Window:CreateTab("OP", nil) -- Title, Image
+
+local FunnyTab = Window:CreateTab("Funny", nil) -- Title, Image 
+
+local MiscTab = Window:CreateTab("Misc", nil) -- Title, Image
+local MiscSection = MiscTab:CreateSection("Misc") 
+
+local ExtrasTab = Window:CreateTab("Extras", nil) -- Title, Image
+
+local CreateTab = Window:CreateTab("Create Buttons (WIP)", nil) -- Title, Image
+
+local AnimationTab = Window:CreateTab("Animations (WIP)", nil) -- Title, Image
+
+local Toggle = SurvivorTab:CreateToggle({
+   Name = "No Cooldown (buggy)",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   loadstring(game:HttpGet("https://pastefy.app/zYqtLBzK/raw"))()
+   end,
+})
+
+local Button = EXETab:CreateButton({
+   Name = "Silent Hits (also doesn't notify other survivors)",
+   Info = "ok", -- Speaks for itself, Remove if none.
+   Callback = function()
+   game:GetService("ReplicatedStorage").remotes.infect:FireServer()
+   end,
+})
+
+local Button = EXETab:CreateButton({
+   Name = "Reset Survivor (they must be still and on final hit)",
+   Info = "see", -- Speaks for itself, Remove if none.
+   Callback = function()
+  local replicatedStorage = game:GetService("ReplicatedStorage")
+
+      local players = game:GetService("Players")
+      
+      -- Folder where player configurations are stored
+      local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+      
+      local targetPlayers = {} -- This will store players whose character doesn’t contain "exe" or “kol”
+      
+      -- Function to find all target players whose character doesn’t contain "exe" or “kol”
+      local function findTargetPlayers()
+          targetPlayers = {} -- Reset the targetPlayers list
+      
+          if displayPlayers then
+              for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+                  local playerInstance = players:FindFirstChild(playerFolder.Name)
+                  if playerInstance then
+                      local statsFolder = playerFolder:FindFirstChild("stats")
+                      if statsFolder and statsFolder:FindFirstChild("character") then
+                          local characterValue = statsFolder.character.Value
+                          if not string.find(characterValue, "exe") and not string.find(characterValue, "kol") then
+                              table.insert(targetPlayers, playerInstance) -- Store the player instance
+                          end
+                      end
+                  end
+              end
+          end
+      
+          return #targetPlayers > 0 -- Return true if any valid target players were found
+      end
+      
+      -- Function to get the nearest target player to the local player
+      local function getNearestTargetPlayer()
+          local localPlayer = players.LocalPlayer
+          local localPlayerCharacter = localPlayer.Character
+          if not localPlayerCharacter or not localPlayerCharacter:FindFirstChild("HumanoidRootPart") then return nil end -- Ensure the character exists
+      
+          local closestDistance = math.huge -- Start with an infinitely large distance
+          local nearestPlayer = nil
+      
+          for _, targetPlayer in pairs(targetPlayers) do
+              local targetCharacter = targetPlayer.Character
+              if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                  -- Calculate the distance between the local player and the target player
+                  local distance = (localPlayerCharacter.HumanoidRootPart.Position - targetCharacter.HumanoidRootPart.Position).Magnitude
+                  if distance < closestDistance then
+                      closestDistance = distance
+                      nearestPlayer = targetPlayer
+                  end
+              end
+          end
+      
+          return nearestPlayer
+      end
+      
+      -- Function to fire events based on the local player's character
+      local function fireEventsForLocalPlayer(targetPlayerName)
+          local localPlayer = players.LocalPlayer
+          local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+      
+          if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+              local localCharacterValue = localPlayerFolder.stats.character.Value -- Access character value
+      
+              if localCharacterValue == "sonicexe" then
+                  -- Remote event for Sonicexe
+                 local args1 = {
+           [1] = "minionAttack"
+       }
+        wait(0.1) -- Delay before firing the event
+       game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args1))
+   
+      
+                  -- Remote event for hit registration
+                  local args = {
+                      [1] = game:GetService("Players")[targetPlayerName].Character
+                  }
+                  wait(0.1) -- Delay before firing the event
+                  replicatedStorage.remotes.hitReg:FireServer(unpack(args))
+      
+              elseif localCharacterValue == "kolossos" then
+                  -- Remote event for Kolossos
+                   local args2 = {
+           [1] = "minionAttack"
+       }
+        wait(0.1) -- Delay before firing the event
+       game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args2))
+   
+      
+                  -- Remote event for hit registration
+                  local args = {
+                      [1] = game:GetService("Players")[targetPlayerName].Character
+                  }
+                  wait(0.1) -- Delay before firing the event
+                  replicatedStorage.remotes.hitReg:FireServer(unpack(args))
+              end
+          end
+      end
+      
+      -- Function to teleport to the nearest target player
+      local function teleportToNearestPlayer()
+          local localPlayer = players.LocalPlayer
+          local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+      
+          if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+              local localCharacterValue = localPlayerFolder.stats.character.Value -- Access character value
+      
+              if localCharacterValue == "sonicexe" or localCharacterValue == "kolossos" then
+                  if findTargetPlayers() then
+                      local nearestPlayer = getNearestTargetPlayer()
+                      if nearestPlayer then -- As long as we find a valid nearest player, teleport
+                          local localCharacter = localPlayer.Character
+      
+                          if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+                              local targetCharacter = nearestPlayer.Character
+                              if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                                  local targetPosition = targetCharacter.HumanoidRootPart.Position
+                                  localCharacter.HumanoidRootPart.CFrame = CFrame.new(targetPosition) -- Teleport to the nearest player's position
+      
+                                  -- Fire events based on the local player's character
+                                  fireEventsForLocalPlayer(nearestPlayer.Name) -- Fire events for the nearest player
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end
+      
+      -- Function to handle player joining
+      players.PlayerAdded:Connect(function(player)
+          player.CharacterAdded:Wait()  -- Wait for the character to be added
+          teleportToNearestPlayer() -- Teleport to the nearest target player when a new player joins
+      end)
+      
+      -- Initial call to teleport to the nearest target player and fire events if the local player is already present
+      if players.LocalPlayer then
+          teleportToNearestPlayer()
+  end
+      
+      end,
+})
+
+local Button = SurvivorTab:CreateButton({
+   Name = "Die Instantly",
+   Info = "ah", -- Speaks for itself, Remove if none.
+   Callback = function()
+   local args = {
+
+       [1] = "drown"
+   }
+   
+   game:GetService("ReplicatedStorage").remotes.actions:FireServer(unpack(args))
+      end,
+   })
+      
+   local Button = SurvivorTab:CreateButton({
+   Name = "Kill EXE (metal)",
+   Info = "use once you grab exe with push", -- Speaks for itself, Remove if none.
+   Callback = function()
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+local players = game:GetService("Players")
+
+-- Folder where player configurations are stored
+local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+
+local targetPlayerName = nil  -- This will store the name of the player with "sonicexe" or "kolossos"
+
+-- Function to find the target player whose character is "sonicexe" or "kolossos"
+local function findTargetPlayer()
+    if displayPlayers then
+        for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+            local playerInstance = players:FindFirstChild(playerFolder.Name)
+            if playerInstance then
+                local statsFolder = playerFolder:FindFirstChild("stats")
+                if statsFolder and statsFolder:FindFirstChild("character") then
+                    local characterValue = statsFolder.character.Value
+                    if characterValue == "sonicexe" or characterValue == "kolossos" then
+                        targetPlayerName = playerFolder.Name  -- Store the player name
+                        return true  -- Stop once the player is found
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- Function to fire events based on the local player's character
+local function fireEventsForLocalPlayer()
+    local localPlayer = players.LocalPlayer
+    local localPlayerName = localPlayer.Name  -- Get local player name
+
+    local localPlayerFolder = displayPlayers:FindFirstChild(localPlayerName)
+
+    if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+        local localCharacterValue = localPlayerFolder.stats.character.Value  -- Access character value
+
+        if targetPlayerName and localCharacterValue == "metalsonic" then
+            -- Save the local player's current position before any teleport
+            local savedPosition = localPlayer.Character.PrimaryPart.Position
+
+            -- Teleport the local player to the target player
+            local targetPlayerCharacter = game:GetService("Players")[targetPlayerName].Character
+            if targetPlayerCharacter then
+                localPlayer.Character:SetPrimaryPartCFrame(targetPlayerCharacter.PrimaryPart.CFrame)
+
+                -- Fire remote events after teleporting to the target player
+                local args = {
+                    [1] = "push"
+                }
+                replicatedStorage.remotes.abilities:FireServer(unpack(args))
+                wait(0.2)
+                -- Remote event for hit registration
+                local args = {
+                    [1] = game:GetService("Players")[targetPlayerName].Character
+                }
+                replicatedStorage.remotes.hitReg:FireServer(unpack(args))
+
+                
+                -- Calculate the void position (assuming Y position 0 is the void)
+                local voidPosition = Vector3.new(savedPosition.X, 0, savedPosition.Z)  -- Assuming the void is at Y = 0
+
+                -- Teleport local player above the void
+                localPlayer.Character:SetPrimaryPartCFrame(CFrame.new(voidPosition.X, voidPosition.Y - 250, voidPosition.Z))  -- Teleport 250 units down
+
+                -- Anchor the local player to prevent falling
+                for _, part in ipairs(localPlayer.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = true
+                    end
+                end
+
+                -- Wait for 5 seconds
+                wait(5)
+
+                -- Teleport back to saved position
+                localPlayer.Character:SetPrimaryPartCFrame(CFrame.new(savedPosition))
+
+                -- Unanchor the local player
+                for _, part in ipairs(localPlayer.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = false
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Function to handle player joining
+players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Wait()  -- Wait for the character to be added
+
+    if findTargetPlayer() then
+        fireEventsForLocalPlayer()
+    end
+end)
+
+-- Initial call to find the target player and fire events if the local player is already present
+if players.LocalPlayer then
+    if findTargetPlayer() then
+        fireEventsForLocalPlayer()
+    end
+end
+
+   end,
+})
+
+local Toggle = EXETab:CreateToggle({
+   Name = "Auto Attack + Range",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+    -- Define a global variable to track the state of the toggle
+_G.isAutoAttackEnabled = not _G.isAutoAttackEnabled -- Toggle the state on each script run
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Function to find the closest player to the local player
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge -- Infinite distance to start with
+    
+    -- Iterate through all players in the game
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Calculate distance between players
+            local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            
+            -- Check if this player is closer
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = otherPlayer
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- Function to fire the remote events in order once, excluding the playSwing event
+local function fireRemoteEventsWithClosestPlayer()
+    -- First remote event: "attack"
+    local args1 = {
+        [1] = "attack"
+    }
+    game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args1))
+    
+    -- Find the closest player to the local player
+    local closestPlayer = getClosestPlayer()
+    
+    if closestPlayer then
+        -- Fire the hit registration event with the closest player's name
+        local args2 = {
+            [1] = game:GetService("Players")[closestPlayer.Name].Character
+        }
+        game:GetService("ReplicatedStorage").remotes.hitReg:FireServer(unpack(args2))
+    else
+        warn("No valid players found.")
+    end
+    
+    -- Second remote event: "cancelAttack"
+    local args3 = {
+        [1] = "cancelAttack"
+    }
+    game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args3))
+end
+
+-- Callback function to repeatedly execute the script every second
+local function automaticFireRemoteEvents()
+    while _G.isAutoAttackEnabled do
+        -- Execute the function to fire the events
+        fireRemoteEventsWithClosestPlayer()
+        
+        -- Wait for 0.35 second before repeating
+        wait(0.35)
+    end
+end
+
+-- Toggle the automatic attack based on the global state
+if _G.isAutoAttackEnabled then
+    print("Auto attack enabled")
+    automaticFireRemoteEvents() -- Start the loop if the toggle is enabled
+else
+    print("Auto attack disabled")
+end
+   end,
+})
+
+local Toggle = EXETab:CreateToggle({
+   Name = "Auto Attack + Range (minion)",
+   CurrentValue = false,
+   Flag = "Toggle2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+    -- Define a global variable to track the state of the toggle
+_G.isAutoAttackEnabled = not _G.isAutoAttackEnabled -- Toggle the state on each script run
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Function to find the closest player to the local player
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge -- Infinite distance to start with
+    
+    -- Iterate through all players in the game
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Calculate distance between players
+            local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            
+            -- Check if this player is closer
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = otherPlayer
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- Function to fire the remote events in order once, excluding the playSwing event
+local function fireRemoteEventsWithClosestPlayer()
+    -- First remote event: "attack"
+    local args1 = {
+        [1] = "minionAttack"
+    }
+    game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args1))
+    
+    -- Find the closest player to the local player
+    local closestPlayer = getClosestPlayer()
+    
+    if closestPlayer then
+        -- Fire the hit registration event with the closest player's name
+        local args2 = {
+            [1] = game:GetService("Players")[closestPlayer.Name].Character
+        }
+        game:GetService("ReplicatedStorage").remotes.hitReg:FireServer(unpack(args2))
+    else
+        warn("No valid players found.")
+    end
+    
+    -- Second remote event: "cancelAttack"
+    local args3 = {
+        [1] = "cancelAttack"
+    }
+    game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args3))
+end
+
+-- Callback function to repeatedly execute the script every second
+local function automaticFireRemoteEvents()
+    while _G.isAutoAttackEnabled do
+        -- Execute the function to fire the events
+        fireRemoteEventsWithClosestPlayer()
+        
+        -- Wait for 0.35 second before repeating
+        wait(0.35)
+    end
+end
+
+-- Toggle the automatic attack based on the global state
+if _G.isAutoAttackEnabled then
+    print("Auto attack enabled")
+    automaticFireRemoteEvents() -- Start the loop if the toggle is enabled
+else
+    print("Auto attack disabled")
+end
+   end,
+})
+
+local Toggle = EXETab:CreateToggle({
+   Name = "spindash attack range",
+   CurrentValue = false,
+   Flag = "Toggle3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+    -- Define a global variable to track the state of the toggle
+    _G.isAutoAttackEnabled = not _G.isAutoAttackEnabled -- Toggle the state on each script run
+    
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    
+    -- Function to find the closest player within 7 studs of the local player
+    local function getClosestPlayer()
+        local closestPlayer = nil
+        local shortestDistance = 7 -- Set the maximum distance to 7 studs
+        
+        -- Iterate through all players in the game
+        for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                -- Calculate distance between players
+                local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+                
+                -- Check if this player is within 7 studs and closer than the previous closest
+                if distance <= 7 and distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = otherPlayer
+                end
+            end
+        end
+        
+        return closestPlayer
+    end
+    
+    -- Function to fire the remote events in order once, excluding the playSwing event
+    local function fireRemoteEventsWithClosestPlayer()
+        -- First remote event: "attack"
+        local args1 = {
+            [1] = "minionAttack"
+        }
+        game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args1))
+        
+        -- Find the closest player to the local player within 7 studs
+        local closestPlayer = getClosestPlayer()
+        
+        if closestPlayer then
+            -- Fire the hit registration event with the closest player's name
+            local args2 = {
+                [1] = game:GetService("Players")[closestPlayer.Name].Character
+            }
+            game:GetService("ReplicatedStorage").remotes.hitReg:FireServer(unpack(args2))
+        else
+            warn("No valid players found within 7 studs.")
+        end
+        
+        -- Second remote event: "cancelAttack"
+        local args3 = {
+            [1] = "cancelAttack"
+        }
+        game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args3))
+    end
+    
+    -- Callback function to repeatedly execute the script every second
+    local function automaticFireRemoteEvents()
+        while _G.isAutoAttackEnabled do
+            -- Execute the function to fire the events
+            fireRemoteEventsWithClosestPlayer()
+            
+            -- Wait for 0.35 second before repeating
+            wait(0.35)
+        end
+    end
+    
+    -- Toggle the automatic attack based on the global state
+    if _G.isAutoAttackEnabled then
+        print("Auto attack enabled")
+        automaticFireRemoteEvents() -- Start the loop if the toggle is enabled
+    else
+        print("Auto attack disabled")
+    end
+
+   end,
+})
+
+local Button = TeleportsTab:CreateButton({
+   Name = "Goto Escape",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Function to recursively search for the "exitRing" model in the workspace
+local function findExitRingInWorkspace()
+    return game.Workspace:FindFirstChild("exitRing", true) -- The second argument 'true' makes the search recursive
+end
+
+-- Function to teleport player to hitbox inside exitRing
+local function teleportToHitbox()
+    -- Find the exitRing model anywhere in the workspace
+    local exitRing = findExitRingInWorkspace()
+    
+    if exitRing and exitRing:IsA("Model") then
+        -- Find the hitbox part inside the exitRing model
+        local hitbox = exitRing:FindFirstChild("hitbox")
+        
+        if hitbox and hitbox:IsA("BasePart") then
+            -- Get the player's HumanoidRootPart for teleportation
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            
+            if humanoidRootPart then
+                -- Teleport the player's HumanoidRootPart to the hitbox's position
+                humanoidRootPart.CFrame = hitbox.CFrame
+            else
+                warn("HumanoidRootPart not found in character.")
+            end
+        else
+            warn("'hitbox' part not found inside 'exitRing'.")
+        end
+    else
+        warn("'exitRing' model not found in workspace.")
+    end
+end
+
+-- Call the function to teleport the player
+teleportToHitbox()
+
+   end,
+})
+
+local Button = TeleportsTab:CreateButton({
+   Name = "Goto FakeRing",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Function to recursively search for the "dullRing" model in the workspace
+local function finddullRingInWorkspace()
+    return game.Workspace:FindFirstChild("dullRing", true) -- The second argument 'true' makes the search recursive
+end
+
+-- Function to teleport player to hitbox inside dullRing
+local function teleportToHitbox()
+    -- Find the dullRing model anywhere in the workspace
+    local dullRing = finddullRingInWorkspace()
+    
+    if dullRing and dullRing:IsA("Model") then
+        -- Find the hitbox part inside the dullRing model
+        local hitbox = dullRing:FindFirstChild("hitbox")
+        
+        if hitbox and hitbox:IsA("BasePart") then
+            -- Get the player's HumanoidRootPart for teleportation
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            
+            if humanoidRootPart then
+                -- Teleport the player's HumanoidRootPart to the hitbox's position
+                humanoidRootPart.CFrame = hitbox.CFrame
+            else
+                warn("HumanoidRootPart not found in character.")
+            end
+        else
+            warn("'hitbox' part not found inside 'dullRing'.")
+        end
+    else
+        warn("'dullRing' model not found in workspace.")
+    end
+end
+
+-- Call the function to teleport the player
+teleportToHitbox()
+
+   end,
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "Mute Steps",
+   CurrentValue = false,
+   Flag = "Toggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   -- Define a global variable to track the state of the toggle
+   _G.isFootstepToggleEnabled = not _G.isFootstepToggleEnabled -- Toggle the state on each script run
+   
+   local player = game.Players.LocalPlayer
+   local playerGui = player:WaitForChild("PlayerGui") -- Wait for PlayerGui to be loaded
+   
+   -- Wait for the stats configuration in PlayerGui
+   local stats = playerGui:WaitForChild("stats") -- Assuming 'stats' is a Configuration object
+   
+   -- Function to check and toggle the muteFootstepSounds setting
+   local function toggleMuteFootstepSounds()
+       -- Check if the stats object contains muteFootstepSounds
+       if stats:FindFirstChild("muteFootstepSounds") then
+           -- Ensure muteFootstepSounds is checked when the toggle is enabled
+           stats.muteFootstepSounds.Value = _G.isFootstepToggleEnabled
+           if _G.isFootstepToggleEnabled then
+               print("Footstep sounds are muted.")
+           else
+               print("Footstep sounds are not muted.")
+           end
+       else
+           warn("muteFootstepSounds setting not found in stats.")
+       end
+   end
+   
+   -- Function to automatically toggle the muteFootstepSounds setting based on the global state
+   local function automaticMuteToggle()
+       while true do
+           -- Check and apply the muteFootstepSounds toggle state
+           toggleMuteFootstepSounds()
+           
+           -- Wait for a short period before checking again
+           wait(0.5)
+       end
+   end
+   
+   -- Toggle the muteFootstepSounds setting based on the global state
+   if _G.isFootstepToggleEnabled then
+       print("Footstep mute enabled")
+       automaticMuteToggle() -- Start the loop if the toggle is enabled
+   else
+       print("Footstep mute disabled")
+       -- Ensure the muteFootstepSounds is unchecked if the toggle is off
+       toggleMuteFootstepSounds()
+   end
+   
+   end,
+})
+
+local Slider = MiscTab:CreateSlider({
+   Name = "Hitbox",
+   Range = {0, 16},
+   Increment = 1,
+   Suffix = "Studs",
+   CurrentValue = 6,
+   Flag = "Slider0",
+   Callback = function(Value)
+      -- Clear previous connections or loops to avoid overlapping behavior
+
+              if _G.ActiveConnection then
+                  _G.ActiveConnection:Disconnect()
+                  _G.ActiveConnection = nil
+              end
+       
+              local replicatedStorage = game:GetService("ReplicatedStorage")
+              local players = game:GetService("Players")
+       
+              -- Folder where player configurations are stored
+              local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+       
+              local function findTargetPlayersWithinDistance()
+                  local targetPlayers = {} -- Reset the targetPlayers list
+                  local localPlayer = players.LocalPlayer
+                  local localCharacter = localPlayer.Character
+       
+                  if displayPlayers and localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+                      local localPosition = localCharacter.HumanoidRootPart.Position -- Get local player's position
+       
+                      for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+                          local playerInstance = players:FindFirstChild(playerFolder.Name)
+                          if playerInstance and playerInstance.Character and playerInstance.Character:FindFirstChild("HumanoidRootPart") then
+                              if playerInstance ~= localPlayer then -- Exclude the local player
+                                  local targetPosition = playerInstance.Character.HumanoidRootPart.Position
+                                  local distance = (localPosition - targetPosition).Magnitude -- Calculate distance between players
+       
+                                  if distance <= Value then -- Only add players within the slider's value in studs
+                                      table.insert(targetPlayers, playerFolder.Name)
+                                  end
+                              end
+                          end
+                      end
+                  end
+       
+                  return targetPlayers
+              end
+       
+              local function fireEventsForNearbyPlayers()
+                  local localPlayer = players.LocalPlayer
+                  local localPlayerName = localPlayer.Name -- Get local player name
+       
+                  -- Check if the local player is in displayPlayers before proceeding
+                  if displayPlayers:FindFirstChild(localPlayerName) then
+                      local targetPlayers = findTargetPlayersWithinDistance()
+                      for _, targetPlayerName in pairs(targetPlayers) do
+                          local args = {
+                              [1] = game:GetService("Players")[targetPlayerName].Character -- Target the player's character directly
+                          }
+                          replicatedStorage.remotes.hitReg:FireServer(unpack(args)) -- Fire the hitReg event
+                      end
+                  end
+              end
+       
+              -- Create a connection to loop the action
+              _G.ActiveConnection = game:GetService("RunService").Stepped:Connect(function()
+                  fireEventsForNearbyPlayers()
+              end)
+          end,
+})
+
+local Slider = MiscTab:CreateSlider({
+    Name = "Running Speed",
+    Range = {0, 300}, -- Adjust the range based on what you want
+    Increment = 1,    -- The increment value
+    Suffix = "Speed", -- Label suffix
+    CurrentValue = 30, -- Starting value for the slider
+    Flag = "RunnersSpeedSlider", -- Unique flag
+    Callback = function(Value)
+        -- Set the runnersSpeed attribute in PlayerGui.stats to the slider value
+        game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("runningSpeed", Value)
+
+        -- Stop any existing update loop before starting a new one
+        if SliderUpdateLoop then
+            SliderUpdateLoop:Disconnect()
+        end
+
+        -- Create a new update loop
+        SliderUpdateLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            -- Set the runnersSpeed attribute in PlayerGui.stats to the current slider value
+            game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("runningSpeed", Value)
+        end)
+    end, 
+})
+
+local Slider = MiscTab:CreateSlider({
+   Name = "Walking Speed",
+   Range = {0, 100}, -- Adjust the range based on what you want
+   Increment = 1,    -- The increment value
+   Suffix = "Speed", -- Label suffix
+   CurrentValue = 14, -- Starting value for the slider
+   Flag = "WalkingSpeedSlider", -- Unique flag
+   Callback = function(Value)
+      -- Set the walkingSpeed attribute in PlayerGui.stats to the slider value
+
+              game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("walkingSpeed", Value)
+      
+              -- Stop any existing update loop before starting a new one
+              if SliderUpdateLoop then
+                  SliderUpdateLoop:Disconnect()
+              end
+      
+              -- Create a new update loop
+              SliderUpdateLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                  -- Set the walkingSpeed attribute in PlayerGui.stats to the current slider value
+                  game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("walkingSpeed", Value)
+              end)
+         end,
+})
+
+local Slider = MiscTab:CreateSlider({
+   Name = "Jump Power",
+   Range = {0, 500}, -- Adjust the range based on what you want
+   Increment = 1,    -- The increment value
+   Suffix = "Jumppower", -- Label suffix
+   CurrentValue = 60, -- Starting value for the slider
+   Flag = "JumpPowerSlider", -- Unique flag
+   Callback = function(Value)
+      local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+
+if humanoid then
+    humanoid.JumpPower = Value  -- Set the jump power to the value of the slider
+end
+         end,
+})
+
+local Slider = MiscTab:CreateSlider({
+   Name = "Climb Speed",
+   Range = {0, 300}, -- Adjust the range based on what you want
+   Increment = 1,    -- The increment value
+   Suffix = "Speed", -- Label suffix
+   CurrentValue = 28, -- Starting value for the slider
+   Flag = "ClimbSpeedSlider", -- Unique flag
+   Callback = function(Value)
+      -- Set the ClimbSpeed attribute in PlayerGui.stats to the slider value
+
+              game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("climbingSpeed", Value)
+      
+              -- Stop any existing update loop before starting a new one
+              if SliderUpdateLoop then
+                  SliderUpdateLoop:Disconnect()
+              end
+      
+              -- Create a new update loop
+              SliderUpdateLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                  -- Set the ClimbSpeed attribute in PlayerGui.stats to the current slider value
+                  game.Players.LocalPlayer.PlayerGui.stats:SetAttribute("climbingSpeed", Value)
+              end)
+         end,
+})
+
+local Button = EXETab:CreateButton({
+   Name = "grab nearest player (ungrab)",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Function to find the closest player to the local player
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge -- Infinite distance to start with
+    
+    -- Iterate through all players in the game
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Calculate distance between players
+            local distance = (humanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            
+            -- Check if this player is closer
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = otherPlayer
+            end
+        end
+    end
+    
+    return closestPlayer, shortestDistance
+end
+
+-- Function to teleport the local player to the nearest player if necessary
+local function teleportToClosestPlayer()
+    local closestPlayer, distance = getClosestPlayer()
+    
+    if closestPlayer then
+        -- Check if the player is more than 10 studs away
+        if distance > 10 then
+            -- Teleport the local player to the closest player's position
+            humanoidRootPart.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame
+            return true -- Indicates teleportation occurred
+        end
+    else
+        warn("No valid players found.")
+    end
+    return false -- No teleportation needed
+end
+
+-- Function to fire the remote events
+local function fireRemoteEventsWithClosestPlayer()
+    -- Check if teleportation is needed (player is further than 10 studs)
+    local teleported = teleportToClosestPlayer()
+    
+    if teleported then
+        -- Wait 0.2 seconds after teleporting before firing the events
+        wait(0.2)
+    end
+    
+    -- First remote event: "grab"
+    local args1 = {
+        [1] = "grab"
+    }
+    game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args1))
+    
+    -- Find the closest player again (they may be closer after teleporting)
+    local closestPlayer = getClosestPlayer()
+    
+    if closestPlayer then
+        -- Fire the hit registration event with the closest player's name
+        local args2 = {
+            [1] = game:GetService("Players")[closestPlayer.Name].Character
+        }
+        game:GetService("ReplicatedStorage").remotes.hitReg:FireServer(unpack(args2))
+    else
+        warn("No valid players found.")
+    end
+end
+
+-- Execute the function to fire the events
+fireRemoteEventsWithClosestPlayer()
+
+   end,
+})
+
+local Button = SurvivorTab:CreateButton({
+   Name = "Shoot Sonic.exe (range stunner)",
+   Callback = function()
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local players = game:GetService("Players")
+   local runService = game:GetService("RunService")
+   
+   -- Folder where player configurations are stored
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   
+   local targetPlayerName = nil  -- This will store the name of the player with "sonicexe" or "kolossos"
+   local targetHumanoidRootPart = nil  -- Cached reference to the target player's HumanoidRootPart
+   
+   -- Function to find the target player whose character is "sonicexe" or "kolossos"
+   local function findTargetPlayer()
+       if displayPlayers then
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance then
+                   local statsFolder = playerFolder:FindFirstChild("stats")
+                   if statsFolder and statsFolder:FindFirstChild("character") then
+                       local characterValue = statsFolder.character.Value
+                       if characterValue == "sonicexe" or characterValue == "kolossos" then
+                           targetPlayerName = playerFolder.Name  -- Store the player name
+                           
+                           -- Get and cache the target player's HumanoidRootPart
+                           local targetPlayer = players:FindFirstChild(targetPlayerName)
+                           if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                               targetHumanoidRootPart = targetPlayer.Character.HumanoidRootPart
+                           end
+                           
+                           return true  -- Stop once the player is found
+                       end
+                   end
+               end
+           end
+       end
+       return false
+   end
+   
+   -- Function to get the current position of the cached HumanoidRootPart
+   local function getTargetPlayerPosition()
+       if targetHumanoidRootPart then
+           return targetHumanoidRootPart.Position  -- Return the cached HumanoidRootPart's position
+       end
+       return nil  -- Return nil if the part is not available
+   end
+   
+   -- Function to fire events based on the local player's character
+   local function fireEventsForLocalPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerName = localPlayer.Name  -- Get local player name
+   
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayerName)
+   
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           local localCharacterValue = localPlayerFolder.stats.character.Value  -- Access character value
+   
+           if targetPlayerName and targetHumanoidRootPart then  -- Ensure the target player and part are found
+               local targetPosition = getTargetPlayerPosition()  -- Get the cached target player's position
+               
+               if targetPosition then  -- Proceed only if the target position is valid
+                   if localCharacterValue == "metalsonic" then
+                       local args = {
+                           [1] = "grapple",
+                           [2] = game:GetService("Players")[targetPlayerName].Character,
+                           [3] = targetPosition  -- Use the target player's current position
+                       }
+                       replicatedStorage.remotes.abilities:FireServer(unpack(args))
+   
+                   elseif localCharacterValue == "tails" then
+                       local args = {
+                           [1] = "cannonShoot",
+                           [2] = targetPosition,  -- Use the target player's current position
+                           [3] = game:GetService("Players")[targetPlayerName].Character
+                       }
+                       replicatedStorage.remotes.abilities:FireServer(unpack(args))
+                   end
+               end
+           end
+       end
+   end
+   
+   -- Function to handle player joining
+   players.PlayerAdded:Connect(function(player)
+       player.CharacterAdded:Wait()  -- Wait for the character to be added
+   
+       if findTargetPlayer() then
+           fireEventsForLocalPlayer()
+       end
+   end)
+   
+   -- Update target position as fast as possible (via RunService's Heartbeat event)
+   runService.Heartbeat:Connect(function()
+       if targetPlayerName then
+           local targetPlayer = players:FindFirstChild(targetPlayerName)
+           if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+               targetHumanoidRootPart = targetPlayer.Character.HumanoidRootPart
+           end
+       end
+   end)
+   
+   -- Initial call to find the target player and fire events if the local player is already present
+   if players.LocalPlayer then
+       if findTargetPlayer() then
+           fireEventsForLocalPlayer()
+       end
+   end
+      
+      end,
+})
+
+-- Create the Dropdown
+local dropdownValue = nil -- Variable to store the selected option
+local Dropdown = CharacterTab:CreateDropdown({
+   Name = "Morphs",
+   Options = {"tails", "knuckles", "eggman", "amy", "cream", "sally", "shadow", "rouge", "metalsonic", "silver", "blaze"},
+   CurrentOption = "tails", -- Use a single string for the default option
+   MultipleOptions = false, -- Only allow one option at a time
+   Flag = "Dropdown1", -- Unique identifier for configuration
+   Callback = function(Value)
+       -- Flatten the value if it's a table
+       if typeof(Value) == "table" then
+           dropdownValue = Value[1] -- Extract the actual string value
+       else
+           dropdownValue = Value -- Use the value directly
+       end
+   end,
+})
+
+-- Create the Morph Button
+local Button = CharacterTab:CreateButton({
+   Name = "Morph",
+   Callback = function()
+       if dropdownValue then -- Ensure a value is selected
+           local args = {
+               [1] = dropdownValue -- Pass the selected option as a string
+           }
+
+           -- Fire the remote event with the correct structure
+           game:GetService("ReplicatedStorage").remotes.morphs:FireServer(unpack(args))
+       else
+           warn("No option selected from the dropdown!") -- Debugging feedback
+       end
+   end,
+})
+
+local Toggle = SurvivorTab:CreateToggle({
+   Name = "Auto Stun EXE (shadow, patched)",
+   CurrentValue = false,
+   Flag = "Toggle2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   -- Define a global variable to track the state of the toggle
+
+   _G.isHomingAttackEnabled = not _G.isHomingAttackEnabled -- Toggle the state on each script run
+   
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local players = game:GetService("Players")
+   
+   -- Folder where player configurations are stored
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   
+   local targetPlayers = {} -- This will store the names of players with "exe" in their character value
+   
+   -- Function to find all players whose character contains "exe"
+   local function findTargetPlayers()
+       targetPlayers = {} -- Reset the targetPlayers list
+   
+       if displayPlayers then
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance then
+                   local statsFolder = playerFolder:FindFirstChild("stats")
+                   if statsFolder and statsFolder:FindFirstChild("character") then
+                       local characterValue = statsFolder.character.Value
+                       if string.find(characterValue, "exe") or string.find(characterValue, "kol") then -- Check if "exe" is in the character value
+                           table.insert(targetPlayers, playerFolder.Name) -- Store the player name
+                       end
+                   end
+               end
+           end
+       end
+   
+       return #targetPlayers > 0 -- Return true if any target players were found
+   end
+   
+   -- Function to fire events for all players whose name contains "exe"
+   local function fireEventsForLocalPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerName = localPlayer.Name -- Get local player name
+   
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayerName)
+   
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           local localCharacterValue = localPlayerFolder.stats.character.Value -- Access local character value
+   
+           if localCharacterValue == "shadow" then -- Ensure the local player is "shadow"
+               for _, targetPlayerName in pairs(targetPlayers) do
+                   local args = {
+                       [1] = "homingAttackTarget", -- This is the action you want to perform
+                       [2] = game:GetService("Players")[targetPlayerName].Character
+                   }
+                   replicatedStorage.remotes.abilities:FireServer(unpack(args))
+               end
+           end
+       end
+   end
+   
+   -- Function to repeatedly fire the event while conditions are met
+   local function automaticFireHomingAttack()
+       while _G.isHomingAttackEnabled do
+           if findTargetPlayers() then
+               fireEventsForLocalPlayer()
+           end
+           wait(0.1) -- Repeat every 0.1 seconds
+       end
+   end
+   
+   -- Toggle the automatic homing attack based on the global state
+   if _G.isHomingAttackEnabled then
+       print("Homing attack enabled")
+       automaticFireHomingAttack() -- Start the loop if the toggle is enabled
+   else
+       print("Homing attack disabled")
+   end
+            end,
+})
+
+local Toggle = SurvivorTab:CreateToggle({
+   Name = " Auto Stun All (shadow, patched)",
+   CurrentValue = false,
+   Flag = "Toggle3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   -- Define a global variable to track the state of the toggle
+
+   _G.isHomingAttackEnabled = not _G.isHomingAttackEnabled -- Toggle the state on each script run
+   
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local players = game:GetService("Players")
+   
+   -- Folder where player configurations are stored
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   
+   local targetPlayers = {} -- This will store the names of all players (whether they contain "exe" in character value or not)
+   
+   -- Function to find all players and check if they are within 40 studs
+   local function findTargetPlayersWithinDistance()
+       targetPlayers = {} -- Reset the targetPlayers list
+       local localPlayer = players.LocalPlayer
+       local localCharacter = localPlayer.Character
+   
+       if displayPlayers and localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+           local localPosition = localCharacter.HumanoidRootPart.Position -- Get local player's position
+   
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance and playerInstance.Character and playerInstance.Character:FindFirstChild("HumanoidRootPart") then
+                   local targetPosition = playerInstance.Character.HumanoidRootPart.Position
+                   local distance = (localPosition - targetPosition).Magnitude -- Calculate distance between players
+   
+                   if distance <= 40 then -- Only add players within 40 studs
+                       table.insert(targetPlayers, playerFolder.Name) -- Store the player name
+                   end
+               end
+           end
+       end
+   
+       return #targetPlayers > 0 -- Return true if any players are within 40 studs
+   end
+   
+   -- Function to fire events for all players within 40 studs
+   local function fireEventsForLocalPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerName = localPlayer.Name -- Get local player name
+   
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayerName)
+   
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           local localCharacterValue = localPlayerFolder.stats.character.Value -- Access local character value
+   
+           if localCharacterValue == "shadow" then -- Ensure the local player is "shadow"
+               for _, targetPlayerName in pairs(targetPlayers) do
+                   -- Use game:GetService("Players")[targetPlayerName].Character directly
+                   local args = {
+                       [1] = "homingAttackTarget", -- This is the action you want to perform
+                       [2] = game:GetService("Players")[targetPlayerName].Character -- Target the player's character directly
+                   }
+                   replicatedStorage.remotes.abilities:FireServer(unpack(args))
+               end
+           end
+       end
+   end
+   
+   -- Function to repeatedly fire the event while conditions are met
+   local function automaticFireHomingAttack()
+       while _G.isHomingAttackEnabled do
+           if findTargetPlayersWithinDistance() then -- Only proceed if players are within 40 studs
+               fireEventsForLocalPlayer()
+           end
+           wait(0.1) -- Repeat every 0.1 seconds
+       end
+   end
+   
+   -- Toggle the automatic homing attack based on the global state
+   if _G.isHomingAttackEnabled then
+       print("Homing attack enabled")
+       automaticFireHomingAttack() -- Start the loop if the toggle is enabled
+   else
+       print("Homing attack disabled")
+   end
+      end,
+})
+
+local Button = TeleportsTab:CreateButton({
+   Name = "Spawn",
+   Callback = function()
+   -- Position to teleport to
+   local teleportPosition = Vector3.new(-16.245420455932617, 3.9999992847442627, 50.47427749633789)
+   
+   -- Get the local player and their character
+   local player = game.Players.LocalPlayer
+   local character = player.Character or player.CharacterAdded:Wait()
+   
+   -- Ensure the character has a HumanoidRootPart (which is the primary part to teleport)
+   local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+   
+   -- Teleport the character to the desired position
+   humanoidRootPart.CFrame = CFrame.new(teleportPosition)
+   
+   -- Optional: Print confirmation
+   print("Player has been teleported to: " .. tostring(teleportPosition))
+   
+   end,
+})
+
+local Button = TeleportsTab:CreateButton({
+   Name = "Closest EXE",
+   Callback = function()
+   local players = game:GetService("Players")
+
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   
+   -- Folder where player configurations are stored
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   
+   local targetPlayers = {} -- This will store players who have "exe" in their character value
+   
+   -- Function to find all target players whose character contains "exe" and ignore the local player
+   local function findTargetPlayers()
+       targetPlayers = {} -- Reset the targetPlayers list
+   
+       -- Get the local player and their character value
+       local localPlayer = players.LocalPlayer
+       local localCharacterValue
+   
+       -- Check if the local player has "exe" in their character
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           localCharacterValue = localPlayerFolder.stats.character.Value
+       end
+   
+       -- Loop through all players to find those with "exe" in their character value, ignoring the local player
+       if displayPlayers then
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance and playerInstance ~= localPlayer then -- Skip local player
+                   local statsFolder = playerFolder:FindFirstChild("stats")
+                   if statsFolder and statsFolder:FindFirstChild("character") then
+                       local characterValue = statsFolder.character.Value
+                       if string.find(characterValue, "exe") or string.find(characterValue, "kol") then -- Only add players WITH "exe" in character value
+                           table.insert(targetPlayers, playerInstance) -- Store the player instance instead of the name
+                       end
+                   end
+               end
+           end
+       end
+   
+       return #targetPlayers > 0 -- Return true if any valid target players were found
+   end
+   
+   -- Function to get the nearest target player to the local player
+   local function getNearestTargetPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerCharacter = localPlayer.Character
+       if not localPlayerCharacter or not localPlayerCharacter:FindFirstChild("HumanoidRootPart") then return end -- Ensure local player's character is loaded
+   
+       local closestDistance = math.huge -- Start with an infinitely large distance
+       local nearestPlayer = nil
+   
+       for _, targetPlayer in pairs(targetPlayers) do
+           local targetCharacter = targetPlayer.Character
+           if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+               -- Calculate the distance between the local player and the target player
+               local distance = (localPlayerCharacter.HumanoidRootPart.Position - targetCharacter.HumanoidRootPart.Position).Magnitude
+               if distance < closestDistance then
+                   closestDistance = distance
+                   nearestPlayer = targetPlayer
+               end
+           end
+       end
+   
+       return nearestPlayer
+   end
+   
+   -- Teleport the local player to the nearest target player
+   local function teleportToNearestPlayer()
+       if findTargetPlayers() then
+           local nearestPlayer = getNearestTargetPlayer()
+           if nearestPlayer then -- If a valid nearest player was found, teleport
+               local localPlayer = players.LocalPlayer
+               local localCharacter = localPlayer.Character
+   
+               if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+                   local targetCharacter = nearestPlayer.Character
+                   local targetPosition = targetCharacter.HumanoidRootPart.Position
+                   localCharacter.HumanoidRootPart.CFrame = CFrame.new(targetPosition) -- Teleport to the nearest player's position
+   
+                   print("Teleported to player:", nearestPlayer.Name, "at position:", targetPosition)
+               end
+           else
+               print("No valid target player found")
+           end
+       else
+           print("No valid target players found")
+       end
+   end
+   
+   -- Call the teleport function once
+   teleportToNearestPlayer()
+         
+   
+   end,
+})
+
+local Button = TeleportsTab:CreateButton({
+   Name = "Closest Survivor",
+   Callback = function()
+   local players = game:GetService("Players")
+
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   local targetPlayers = {}
+   
+   local function findTargetPlayers()
+       targetPlayers = {}
+       local localPlayer = players.LocalPlayer
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+       local localCharacterValue
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           localCharacterValue = localPlayerFolder.stats.character.Value
+       end
+   
+       if displayPlayers then
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance and playerInstance ~= localPlayer then
+                   local statsFolder = playerFolder:FindFirstChild("stats")
+                   if statsFolder and statsFolder:FindFirstChild("character") then
+                       local characterValue = statsFolder.character.Value
+                       if not string.find(characterValue, "exe") and not string.find(characterValue, "kol") then
+                           table.insert(targetPlayers, playerInstance)
+                       end
+                   end
+               end
+           end
+       end
+   
+       return #targetPlayers > 0
+   end
+   
+   local function getNearestTargetPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerCharacter = localPlayer.Character
+       if not localPlayerCharacter then return end
+       local closestDistance = math.huge
+       local nearestPlayer = nil
+   
+       for _, targetPlayer in pairs(targetPlayers) do
+           local targetCharacter = targetPlayer.Character
+           if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+               local distance = (localPlayerCharacter.HumanoidRootPart.Position - targetCharacter.HumanoidRootPart.Position).Magnitude
+               if distance < closestDistance then
+                   closestDistance = distance
+                   nearestPlayer = targetPlayer
+               end
+           end
+       end
+   
+       return nearestPlayer
+   end
+   
+   local function teleportToNearestPlayer()
+       if findTargetPlayers() then
+           local nearestPlayer = getNearestTargetPlayer()
+           if nearestPlayer then
+               local localPlayer = players.LocalPlayer
+               local localCharacter = localPlayer.Character
+   
+               if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+                   local targetCharacter = nearestPlayer.Character
+                   local targetPosition = targetCharacter.HumanoidRootPart.Position
+                   localCharacter.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+               end
+           end
+       end
+   end
+   
+   teleportToNearestPlayer()
+            
+   end,
+})
+
+local Button = SurvivorTab:CreateButton({
+   Name = "Kill EXE (knuckles/amy, exe must be still)",
+   Callback = function()
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local players = game:GetService("Players")
+   
+   -- Folder where player configurations are stored
+   local displayPlayers = replicatedStorage:FindFirstChild("displayPlayers")
+   
+   local targetPlayers = {} -- This will store players whose character contains "exe"
+   
+   -- Function to find all target players whose character contains "exe"
+   local function findTargetPlayers()
+       targetPlayers = {} -- Reset the targetPlayers list
+   
+       if displayPlayers then
+           for _, playerFolder in pairs(displayPlayers:GetChildren()) do
+               local playerInstance = players:FindFirstChild(playerFolder.Name)
+               if playerInstance then
+                   local statsFolder = playerFolder:FindFirstChild("stats")
+                   if statsFolder and statsFolder:FindFirstChild("character") then
+                       local characterValue = statsFolder.character.Value
+                       if string.find(characterValue, "exe") or string.find(characterValue, "kol") then
+                           table.insert(targetPlayers, playerInstance) -- Store the player instance
+                       end
+                   end
+               end
+           end
+       end
+   
+       return #targetPlayers > 0 -- Return true if any valid target players were found
+   end
+   
+   -- Function to get the nearest target player to the local player
+   local function getNearestTargetPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerCharacter = localPlayer.Character
+       if not localPlayerCharacter or not localPlayerCharacter:FindFirstChild("HumanoidRootPart") then return nil end -- Ensure the character exists
+   
+       local closestDistance = math.huge -- Start with an infinitely large distance
+       local nearestPlayer = nil
+   
+       for _, targetPlayer in pairs(targetPlayers) do
+           local targetCharacter = targetPlayer.Character
+           if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+               -- Calculate the distance between the local player and the target player
+               local distance = (localPlayerCharacter.HumanoidRootPart.Position - targetCharacter.HumanoidRootPart.Position).Magnitude
+               if distance < closestDistance then
+                   closestDistance = distance
+                   nearestPlayer = targetPlayer
+               end
+           end
+       end
+   
+       return nearestPlayer
+   end
+   
+   -- Function to fire events based on the local player's character
+   local function fireEventsForLocalPlayer(targetPlayerName)
+       local localPlayer = players.LocalPlayer
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+   
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           local localCharacterValue = localPlayerFolder.stats.character.Value -- Access character value
+   
+           if localCharacterValue == "amy" then
+               -- Remote event for Amy
+               local args = {
+                   [1] = "hammerAttack"
+               }
+               wait(0.1) -- Delay before firing the event
+               replicatedStorage.remotes.abilities:FireServer(unpack(args))
+   
+               -- Remote event for hit registration
+               local args = {
+                   [1] = game:GetService("Players")[targetPlayerName].Character
+               }
+               wait(0.1) -- Delay before firing the event
+               replicatedStorage.remotes.hitReg:FireServer(unpack(args))
+   
+           elseif localCharacterValue == "knuckles" then
+               -- Remote event for Knuckles
+               local args = {
+                   [1] = "punch"
+               }
+               wait(0.1) -- Delay before firing the event
+               replicatedStorage.remotes.abilities:FireServer(unpack(args))
+   
+               -- Remote event for hit registration
+               local args = {
+                   [1] = game:GetService("Players")[targetPlayerName].Character
+               }
+               wait(0.1) -- Delay before firing the event
+               replicatedStorage.remotes.hitReg:FireServer(unpack(args))
+           end
+       end
+   end
+   
+   -- Function to teleport to the nearest target player
+   local function teleportToNearestPlayer()
+       local localPlayer = players.LocalPlayer
+       local localPlayerFolder = displayPlayers:FindFirstChild(localPlayer.Name)
+   
+       if localPlayerFolder and localPlayerFolder:FindFirstChild("stats") and localPlayerFolder.stats:FindFirstChild("character") then
+           local localCharacterValue = localPlayerFolder.stats.character.Value -- Access character value
+   
+           if localCharacterValue == "amy" or localCharacterValue == "knuckles" then
+               if findTargetPlayers() then
+                   local nearestPlayer = getNearestTargetPlayer()
+                   if nearestPlayer then -- As long as we find a valid nearest player, teleport
+                       local localCharacter = localPlayer.Character
+   
+                       if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+                           local targetCharacter = nearestPlayer.Character
+                           if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                               local targetPosition = targetCharacter.HumanoidRootPart.Position
+                               localCharacter.HumanoidRootPart.CFrame = CFrame.new(targetPosition) -- Teleport to the nearest player's position
+   
+                               -- Fire events based on the local player's character
+                               fireEventsForLocalPlayer(nearestPlayer.Name) -- Fire events for the nearest player
+                           end
+                       end
+                   end
+               end
+           end
+       end
+   end
+   
+   -- Function to handle player joining
+   players.PlayerAdded:Connect(function(player)
+       player.CharacterAdded:Wait()  -- Wait for the character to be added
+       teleportToNearestPlayer() -- Teleport to the nearest target player when a new player joins
+   end)
+   
+   -- Initial call to teleport to the nearest target player and fire events if the local player is already present
+   if players.LocalPlayer then
+       teleportToNearestPlayer()
+   end
+   
+         end,
+})
+
+local Button = ExtrasTab:CreateButton({
+   Name = "Infinite Yeild",
+   Callback = function()
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source"))()
+   end,
+})
+
+local Button = ExtrasTab:CreateButton({
+   Name = "Dex",
+   Callback = function()
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
+   end,
+})
+
+local Button = ExtrasTab:CreateButton({
+   Name = "SimpleSpy for Mobile",
+   Callback = function()
+   loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/SimpleSpy/refs/heads/main/Mobile.lua"))()
+   end,
+})
+
+local Button = CreateTab:CreateButton({
+   Name = "Shoot EXE",
+   Callback = function()
+  loadstring(game:HttpGet("https://pastefy.app/1E5PAWWK/raw"))()
+   end,
+})
+
+local Button = AnimationTab:CreateButton({
+   Name = "Sonic.exe",
+   Callback = function()
+   loadstring(game:HttpGet("https://pastefy.app/HZVUugkT/raw"))()
+   end,
+})
+
+local Button = AnimationTab:CreateButton({
+   Name = "Amy",
+   Callback = function()
+loadstring(game:HttpGet("https://pastefy.app/xgiKQ2Li/raw"))()
+   end,
+})
+
+local Toggle = FunnyTab:CreateToggle({
+   Name = "Spin",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   -- Define a global variable to track the toggle state
+
+   _G.isJetpackEnabled = not _G.isJetpackEnabled -- Toggle the state on each script run
+   
+   -- Define the necessary services and local player
+   local player = game.Players.LocalPlayer
+   local character = player.Character or player.CharacterAdded:Wait()
+   local replicatedStorage = game:GetService("ReplicatedStorage")
+   local remoteEvent = replicatedStorage:WaitForChild("remotes"):WaitForChild("abilities")
+   local animationId = "rbxassetid://18400648383"
+   
+   -- Load the animation
+   local humanoid = character:WaitForChild("Humanoid")
+   local animation = Instance.new("Animation")
+   animation.AnimationId = animationId
+   local animationTrack = humanoid:LoadAnimation(animation)
+   
+   -- Function to play the animation and fire the remote event repeatedly
+   local function loopAnimationAndFireEvent()
+       -- Ensure the animation track is playing at the correct speed
+       animationTrack:Play()
+       animationTrack:AdjustSpeed(5) -- Set animation speed
+   
+       -- Keep firing the event as long as toggle is enabled
+       while _G.isJetpackEnabled do
+           -- Fire remote event
+           local args = {
+               [1] = "jetpack"
+           }
+           remoteEvent:FireServer(unpack(args))
+   
+           -- Wait briefly to avoid spamming too fast
+           wait(0.1)
+       end
+   
+       -- Stop the animation when toggled off
+       animationTrack:Stop()
+   end
+   
+   -- Toggle the functionality based on the global state
+   if _G.isJetpackEnabled then
+       print("Jetpack mode enabled")
+       loopAnimationAndFireEvent()
+   else
+       print("Jetpack mode disabled")
+       animationTrack:Stop() -- Ensure animation stops when toggled off
+   end
+            
+   end,
+})
+
+local Button = FunnyTab:CreateButton({
+
+   Name = "Walk on Walls (stays until reset)",
+   Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/WalkOnWalls", true))()
+   end,
+})
+
+local Toggle = OPTab:CreateToggle({
+   Name = "Shadow - Loop Sparks (ruins camera for nearby players)",
+   CurrentValue = false,
+   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   -- Define a global variable to track the state of the toggle
+
+   _G.isEventLoopEnabled = not _G.isEventLoopEnabled -- Toggle the state on each script run
+   
+   -- Function to fire the remote event twice
+   local function fireRemoteEvent()
+       local args = {
+           [1] = "boostState",
+           [2] = "landed"
+       }
+   
+       -- Fire the event twice
+       game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args))
+       game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args))
+       game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args))
+   end
+   
+   -- Function to run the event loop
+   local function eventLoop()
+       while _G.isEventLoopEnabled do
+           fireRemoteEvent() -- Fire the events
+           task.wait(0) -- Wait for 0 seconds to loop as fast as possible
+       end
+   end
+   
+   -- Check the toggle state and start/stop the loop
+   if _G.isEventLoopEnabled then
+       print("Event loop enabled.")
+       eventLoop() -- Start the loop
+   else
+       print("Event loop disabled.")
+   end
+   
+      end,
+})
+
+local Toggle = OPTab:CreateToggle({
+   Name = "Cream - Loop Heal - may cause lag (heals others at fast rate, use as minion)",
+   CurrentValue = false,
+   Flag = "Toggle2", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+   loadstring(game:HttpGet("https://pastefy.app/2pO3CFAk/raw"))()
+    end,
+
+   })
+   
+   local Toggle = OPTab:CreateToggle({
+      Name = "Cream - Loop Heal - (slower version)",
+      CurrentValue = false,
+      Flag = "Toggle3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+      Callback = function(Value)
+      loadstring(game:HttpGet("https://pastefy.app/oxJvvDYb/raw"))()
+
+             end,
+   
+      })      
+      
+      local Toggle = OPTab:CreateToggle({
+            Name = "Cream - Loop Heal Nearest Player",
+            CurrentValue = false,
+            Flag = "Toggle3", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+            Callback = function(Value)
+            loadstring(game:HttpGet("https://pastefy.app/JeZmaCVI/raw"))()
+            
+      
+                   end,
+         
+            })      
+            
+            local Toggle = OPTab:CreateToggle({
+                        Name = "Loop Grapple EXE (must be minion/metalsonic)",
+                        CurrentValue = false,
+                        Flag = "Toggle4", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+                        Callback = function(Value)
+                        loadstring(game:HttpGet("https://pastefy.app/SxTsiKd2/raw"))()
+                       
+                  
+                               end,
+                     
+                        })   
+                           
+local Toggle = OPTab:CreateToggle({
+ Name = "Trap EXE - silver/minion - retoggle to reset barrier positions (be near exe)",
+CurrentValue = false,
+Flag = "Toggle5", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+Callback = function(Value)
+loadstring(game:HttpGet("https://pastefy.app/TKbqAf84/raw"))()
+                       
+                   end,
+                     
+                        })           
+            
+local Button = OPTab:CreateButton({
+   Name = "Lag/Crash others - Metal/Minion - spam this (This will affect you and will last until disconect)",
+   Callback = function()
+loadstring(game:HttpGet("https://pastefy.app/SMd1rIDC/raw"))()
+
+   end,
+}) 
+
